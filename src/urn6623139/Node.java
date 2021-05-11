@@ -3,6 +3,9 @@ package urn6623139;
 class Node{
 	private Segment segment;
 	private Node next;
+	
+	private Node previous;
+	
 	private Boolean allocated;
 	
 	private int base;
@@ -13,8 +16,9 @@ class Node{
 		segment = null;
 	}
 	
-	public Node(Node n, Boolean allocated) {
-		this.next = n;
+	public Node(Node next, Node previous, Boolean allocated) {
+		this.next = next;
+		this.previous = previous;
 		this.allocated = allocated;
 	}
 	
@@ -67,6 +71,13 @@ class Node{
     }
 
     
+    public Node getPrevious() {
+    	return previous;
+    }
+    
+    public void setPrevious(Node n) {
+    	this.previous = n;
+    }
     
     
     /**

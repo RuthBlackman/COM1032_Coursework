@@ -10,9 +10,12 @@ public class Segment {
 	private int limit;
 	private int readOnly; 
 	
-	private int segment_number;
+	//private int segment_number;
 	
-	private int process_number;
+	//private int process_number;
+	
+	private Process process;
+	
     private Hole hole;
 
     private List<Process> sharedWith;
@@ -28,9 +31,10 @@ public class Segment {
     
     
     
-    public Segment(int process_number, int segment_number, int limit) {
-    	this.process_number = process_number;
-    	this.segment_number = segment_number;
+    public Segment(Process proc,  int limit) {
+    	//this.process_number = process_number;
+    	//this.segment_number = segment_number;
+    	this.process = proc;
     	this.limit = limit;
     	this.sharedWith = new ArrayList<Process>();
     }
@@ -44,10 +48,12 @@ public class Segment {
     public void setLimit(int limit) {
     	this.limit	= limit;
     }
-    
+   
+    /*
     public int getSegmentNumber() {
     	return this.segment_number;
     }
+    */
     
     public int getLimit() {
     	return this.limit;
@@ -57,8 +63,14 @@ public class Segment {
     	return this.base;
     }
     
+    /*
     public int getProcessNumber() {
     	return this.process_number;
+    }
+    */
+    
+    public Process getProcess() {
+    	return this.process;
     }
 }
 

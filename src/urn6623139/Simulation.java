@@ -10,12 +10,13 @@ public class Simulation {
 		/*
 		 * Initialise MemoryManagement object
 		 */
-		MemoryManagement memManager = new MemoryManagement(1024, 124); // 1024 bytes is the total memory 
+		MemoryManagement memManager = new MemoryManagement(1024, 124); // 1024 bytes is the total memory, 124 is the OS space 
 		
 		System.out.println("---------------------------------------------------------------------------------------------------");
 		System.out.println("	Memory Manager \n");
 		System.out.println("	Total size: 1024");
 		System.out.println("	OS size: 124");
+		System.out.println("        Usable size: 900");
 		System.out.println("--------------------------------------------------------------------------------------------------\n");
 		
 		
@@ -35,25 +36,25 @@ public class Simulation {
 		/*
 		System.out.println("\n");
 		
-		int [] example2 = {2, 100, 200, 3};
+		String example2  = "2, 100, 200, 3";
 		memManager.parseExample(Arrays.toString(example2).replace("[", "").replace("]", ""));
 		
 		
 		System.out.println("\n");
 		
-		int [] example3 = {2, 100, 200, 3};
+		String example3 = "2, 100, 200, 3";
 		memManager.parseExample(Arrays.toString(example3).replace("[", "").replace("]", ""));
 		
 		
 		System.out.println("\n");
 		
-		int [] example4 = {2, 100, 200, 3};
+		String example4  = "2, 100, 200, 3";
 		memManager.parseExample(Arrays.toString(example4).replace("[", "").replace("]", ""));
 		
 		
 		System.out.println("\n");
 		
-		int [] example5 = {2, 100, 200, 3};
+		String example5  = "2, 100, 200, 3";
 		memManager.parseExample(Arrays.toString(example5).replace("[", "").replace("]", ""));
 		
 */

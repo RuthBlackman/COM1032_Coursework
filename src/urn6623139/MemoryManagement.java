@@ -1,7 +1,9 @@
 package urn6623139;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MemoryManagement {
 
@@ -11,12 +13,12 @@ public class MemoryManagement {
 	public static int user_space; // this is the space that can be used for the segments
 	
 	private SegmentTable segmentTable;
-	private List<Process> processesInMemory;
+	private Map<Process, Segment> processesInMemory;
 	
 	
 	private Node start;
 	private Node end; 
-	
+	private Node previous;
 
 	
 	public MemoryManagement(int total_bytes, int os_size) {
@@ -26,7 +28,7 @@ public class MemoryManagement {
 		
 		segmentTable = new SegmentTable();
 
-		this.processesInMemory = new ArrayList<Process>();
+		this.processesInMemory = new HashMap<Process, Segment>();
 
 		this.initaliseLinkedList();
 		
@@ -143,22 +145,31 @@ public class MemoryManagement {
 		//System.out.println("seg num: " + segment_number);
 		//System.out.println("Limit: " + numBytes );
 		//System.out.println("Process: " + proc.getReference_number());
-		int process_number = proc.getReference_number();
 		
-		Segment segment = new Segment(process_number, segment_number, numBytes);
+		//int process_number = proc.getReference_number();
+
+		Segment segment = new Segment(proc, numBytes);
+		proc.addProcessToSegment(segment);
+		
+		if(!processesInMemory.containsKey(proc)) {
+			processesInMemory.put(proc, segment);
+		}
+		
+		
 		this.allocateMemory(segment);
 		System.out.println("\n");
 		
-		this.deallocateMemory(segment, 20);
-		
+		//this.deallocateMemory(segment, 20);
+		this.printMemory();
 		}
 	}
 	
 	
 	public void initaliseLinkedList() {
-    	Node startNode = new Node(null, false);
+    	Node startNode = new Node(null, null, false);
     	
     	this.start = startNode;
+    	this.previous = null;
     	startNode.setBase(0);
     	startNode.setLimit(this.getUser_space());
         this.end = null;
@@ -178,17 +189,26 @@ public class MemoryManagement {
 				System.out.println("Success");
 			}
 		}
-		
-		/*
-		*/
 	}
+	
+    public int getIndexOfSegment(Segment segment) {
+    	int index = 0;
+    	for(Segment s : segment.getProcess().getListSegments()) {
+    		if(s == segment) {
+    			return index;
+    		}
+    		index++;
+    	}
+    	return -1;
+    }
 	
 	
     public boolean segmentAlreadyUsed(Segment segment) {
     	Node temp = start;
     	while(temp != null) {
     		if(temp.isAllocated()) {
-    			if(temp.getSegment().getSegmentNumber() == segment.getSegmentNumber()) {
+    			if(this.getIndexOfSegment(temp.getSegment()) == this.getIndexOfSegment(segment)) {
+    			//if(temp.getSegment().getSegmentNumber() == segment.getSegmentNumber()) {
         			return true;
         		}
     		}
@@ -200,20 +220,46 @@ public class MemoryManagement {
     
     
     public boolean firstFitInsert(Segment segment) {
-        Node newNode = new Node(null,true);
+        Node newNode = new Node(null, null, true);
         newNode.setSegment(segment);
+        Node temp = start;
 
-        if(!start.isAllocated()){
+        if(!start.isAllocated()){ // if the memory only contains one hole - no segments yet
             start = newNode;
-            end = null;
-            System.out.println("Memory successfully allocated to segment "+ segment.getSegmentNumber() + " for process " + segment.getProcessNumber());
+            end = temp;
+            previous = null;
+            
+            start.setNext(end);
+            start.setBase(0);
+            start.setLimit(newNode.getSegment().getLimit());
+            
+            end.setBase(start.getBase());
+            end.setLimit(end.getLimit() - start.getLimit());
+            //System.out.println("Memory successfully allocated to segment "+ segment.getSegmentNumber() + " for process " + segment.getProcessNumber());
+            System.out.println("Memory successfully allocated to segment " + (this.getIndexOfSegment(segment) + 1) + " for process " + segment.getProcess().getReference_number());
             newNode.getSegment().setBase(0);
             System.out.println("Base: " + 0 + ", Limit: " + newNode.getSegment().getLimit());
+            //this.printMemory();
             return true;
-        }else{
+        }else{ // if the memory contains holes and segments
         	Node curr = start;
         	while(curr != null) {
-        	return false;
+        		if(!curr.isAllocated()) { // if the currents node is a hole
+        			if(curr.getLimit() < segment.getLimit() ) { // if the size of the hole is less than the size of the segment
+        				curr.getPrevious().setNext(newNode);
+        				newNode.setNext(curr);
+        				newNode.setPrevious(curr.getPrevious());
+        				curr.setPrevious(newNode);
+        				
+        				newNode.setBase(newNode.getPrevious().getLimit());
+        				newNode.setLimit(segment.getLimit());
+        				curr.setBase(newNode.getLimit());
+        				curr.setLimit(curr.getLimit() - newNode.getLimit());
+        				return true;
+        			}
+        		}
+        	
+        		curr = curr.getNext();
         	}
         	
         	return false;
@@ -231,18 +277,20 @@ public class MemoryManagement {
 			Node temp = start;
 			while(temp != null) {
 				if(temp.isAllocated()) {
-					if(temp.getSegment().getSegmentNumber() == segment.getSegmentNumber()) {
+					//if(temp.getSegment().getSegmentNumber() == segment.getSegmentNumber()) {
+					if(this.getIndexOfSegment(temp.getSegment()) == this.getIndexOfSegment(segment)) {
 						segment.setLimit(segment.getLimit()-size);
 						temp.setLimit(segment.getLimit());
 						if(segment.getLimit() == 0) { // if the size of the segment is now 0, remove it from the LL
 							System.out.println("Segment has a size of 0");
 						}else { // else, create a hole with the size of memory removed, and set that to be the next node
-							Node newNext = new Node(temp.getNext(), false);
+							Node newNext = new Node(temp.getNext(), temp, false);
 							temp.setNext(newNext);
 							newNext.setLimit(size);
 							newNext.setBase(segment.getLimit());
 							System.out.println(size + " bytes successfully deallocated from memory");
-							System.out.println("Segment " + segment.getSegmentNumber() + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
+							//System.out.println("Segment " + segment.getSegmentNumber() + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
+							System.out.println("Segment " + this.getIndexOfSegment(segment) + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
 							System.out.println("Next node (hole): Base:" + newNext.getBase() + " Limit: " + newNext.getLimit() );
 						}
 					}
@@ -254,7 +302,7 @@ public class MemoryManagement {
     
     public void printMemory() {
     	Node temp = this.start;
-    	StringBuffer memory = new StringBuffer("---------------------------------------------------------------------------------------------------\n");
+    	StringBuffer memory = new StringBuffer("\n---------------------------------------------------------------------------------------------------\n");
     	memory.append("\tMain Memory\n");
     	memory.append("---------------------------------------------------------------------------------------------------\n");
     	String A = "";
@@ -267,6 +315,7 @@ public class MemoryManagement {
     		memory.append("[" + A + temp.getLimit() +"] ");
     		temp = temp.getNext();
     	}
+    	memory.append("\n");
     	System.out.println(memory.toString());
     }
 	
