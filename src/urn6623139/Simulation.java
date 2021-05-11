@@ -27,26 +27,34 @@ public class Simulation {
 		System.out.println("Start Example A.1.2\n");
 
 		//int [] example1 = {1, 100, 200, 3};
-		String example1 = "1, 100, 200, 3";
 		//memManager.parseExample(Arrays.toString(example1).replace("[", "").replace("]", ""));
+		
+		String example1 = "1, 100, 200, 3";
 		memManager.parseExample(example1);
 		
-		memManager.printMemory();
+		//memManager.printMemory();
+		
+		
+		//System.out.println("\n");
+		
+		//String example2  = "2, 100, 200, 3, 300";
+		
+		String example2 = "1, -25, -50, -1";
+		memManager.parseExample(example2);
+		//memManager.printMemory();
+		
+		//System.out.println("\n");
+		
 		
 		/*
-		System.out.println("\n");
-		
-		String example2  = "2, 100, 200, 3";
-		memManager.parseExample(Arrays.toString(example2).replace("[", "").replace("]", ""));
-		
-		
-		System.out.println("\n");
-		
-		String example3 = "2, 100, 200, 3";
-		memManager.parseExample(Arrays.toString(example3).replace("[", "").replace("]", ""));
+		String example3 = "3, 500, 200, 3";
+		memManager.parseExample(example3);
+		memManager.printMemory();
 		
 		
 		System.out.println("\n");
+
+		
 		
 		String example4  = "2, 100, 200, 3";
 		memManager.parseExample(Arrays.toString(example4).replace("[", "").replace("]", ""));
@@ -70,9 +78,15 @@ public class Simulation {
 		System.out.println("");
 		
 		/*
-		String example2 = "1, [100; 0], [200; 0; 2; 3]";
+		String example2 = "1, [100; 0], [200; 0; 2; 3; 4], 10";
 		memManager.parseExample(example2);
-		memManager.printMemory();
+		
+		String example3 = "1, [10; 1], [-200; 0; 2; 5], 10";
+		memManager.parseExample(example3);
+		
+		String example4 = "3, [100; 0], [200; 0; 2; 3]";
+		memManager.parseExample(example4);
+		//memManager.printMemory();
 		*/
 		
 		/*

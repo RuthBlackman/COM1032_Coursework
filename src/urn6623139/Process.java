@@ -25,6 +25,7 @@ public class Process {
         return this.reference_number;
     }
     
+    /*
     public int getIndexOfSegment(Segment segment) {
     	int index = 0;
     	for(Segment s : this.segments) {
@@ -35,6 +36,7 @@ public class Process {
     	}
     	return -1;
     }
+    */
     
     public List<Segment> getListSegments(){
     	return this.segments;

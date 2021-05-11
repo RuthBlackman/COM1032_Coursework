@@ -13,7 +13,7 @@ public class MemoryManagement {
 	public static int user_space; // this is the space that can be used for the segments
 	
 	private SegmentTable segmentTable;
-	private Map<Process, Segment> processesInMemory;
+	private Map<Process, List<Segment> > processesInMemory;
 	
 	
 	private Node start;
@@ -28,7 +28,7 @@ public class MemoryManagement {
 		
 		segmentTable = new SegmentTable();
 
-		this.processesInMemory = new HashMap<Process, Segment>();
+		this.processesInMemory = new HashMap<Process, List<Segment> >();
 
 		this.initaliseLinkedList();
 		
@@ -97,7 +97,7 @@ public class MemoryManagement {
 
 		System.out.println("Process: " + proc.getReference_number());
 		
-
+	
 		
 		//TODO: remove the print
 		for (int i =1; i<size; i++){
@@ -148,15 +148,77 @@ public class MemoryManagement {
 		
 		//int process_number = proc.getReference_number();
 
+			System.out.println("\nPROCESSES AND SEGMENTS IN MEMORY");
+			for(Map.Entry<Process,List<Segment> > entry : this.processesInMemory.entrySet()) {
+				for(Segment s : entry.getValue()) {
+					System.out.println("Process " + entry.getKey().getReference_number() + " Segment " + (this.getIndexOfSegment(s)+1));
+				}
+				//System.out.println("Process: " + entry.getKey().getReference_number() + " Segment" + (this.getIndexOfSegment(entry.getValue())+1));
+			}
+			System.out.println("Size: " + processesInMemory.size() +"\n");
+			
+			
 		Segment segment = new Segment(proc, numBytes);
-		proc.addProcessToSegment(segment);
+		Segment a = null;
 		
-		if(!processesInMemory.containsKey(proc)) {
-			processesInMemory.put(proc, segment);
+		
+		Boolean processAlreadyInMemory = false;
+		Boolean segmentForProcessAlreadyInMemory = false;
+		for(Map.Entry<Process,List<Segment> > entry : this.processesInMemory.entrySet()) {
+			if(entry.getKey().getReference_number() == proc.getReference_number()) {
+				processAlreadyInMemory = true;
+				for(Segment s : entry.getValue()) {
+					if((this.getIndexOfSegment(s)+1) == segment_number) {
+						System.out.println("segment already in memory");
+						segmentForProcessAlreadyInMemory = true;
+						a = s;
+						System.out.println("a: base: " + a.getBase() + " limit: " + a.getLimit());
+					}
+				}
+				//if((this.getIndexOfSegment(entry.getValue()) + 1) == segment_number) {
+				//	System.out.println("line 161");
+				//	segmentForProcessAlreadyInMemory = true;
+				//	a = entry.getValue();
+				//}
+			}
 		}
 		
 		
-		this.allocateMemory(segment);
+		
+		
+		if(processAlreadyInMemory == false) {
+			System.out.println("Process not already in memory");
+			System.out.println("Putting process into hash map");
+			proc.addProcessToSegment(segment);
+			processesInMemory.put(proc, proc.getListSegments());
+			
+		}else { // process is already in memory, so the segment may be too
+			System.out.println("Process in memory");
+			if(segmentForProcessAlreadyInMemory == false) { // segment is not in memory for that process
+				System.out.println("Segment not in memory for that process");
+				proc.addProcessToSegment(segment);
+				processesInMemory.put(proc, proc.getListSegments());
+				
+			}else { // segment is in memory for that process
+				System.out.println("Segment already in memory for that process");
+				segment = a;
+				System.out.println("segment: base: " + segment.getBase() + " limit: " + segment.getLimit());
+			}
+		}
+		
+		System.out.println("Segment before going into deallocateMemory() or allocateMemory()");
+		System.out.println("Segment " + (this.getIndexOfSegment(segment) +1) + " base: " + segment.getBase() + " limit: " + segment.getLimit() + " size to change: " + numBytes);
+
+		
+		if(numBytes < 0) {
+			numBytes *= -1;
+			System.out.println("Deallocating: " + numBytes);
+			this.deallocateMemory(segment, numBytes);
+		}else if (numBytes > 0) {
+			System.out.println("Allocating: " + numBytes);
+			this.allocateMemory(segment);
+		}
+		
 		System.out.println("\n");
 		
 		//this.deallocateMemory(segment, 20);
@@ -173,6 +235,7 @@ public class MemoryManagement {
     	startNode.setBase(0);
     	startNode.setLimit(this.getUser_space());
         this.end = null;
+        this.start.setAllocation(false);
         
 	}
 	
@@ -207,7 +270,7 @@ public class MemoryManagement {
     	Node temp = start;
     	while(temp != null) {
     		if(temp.isAllocated()) {
-    			if(this.getIndexOfSegment(temp.getSegment()) == this.getIndexOfSegment(segment)) {
+    			if((this.getIndexOfSegment(temp.getSegment())+1) == (this.getIndexOfSegment(segment)+1) && temp.getSegment().getProcess() == segment.getProcess()) {
     			//if(temp.getSegment().getSegmentNumber() == segment.getSegmentNumber()) {
         			return true;
         		}
@@ -233,19 +296,28 @@ public class MemoryManagement {
             start.setBase(0);
             start.setLimit(newNode.getSegment().getLimit());
             
-            end.setBase(start.getBase());
+            end.setBase(start.getLimit());
             end.setLimit(end.getLimit() - start.getLimit());
+           
+            end.setPrevious(start);
+            
             //System.out.println("Memory successfully allocated to segment "+ segment.getSegmentNumber() + " for process " + segment.getProcessNumber());
             System.out.println("Memory successfully allocated to segment " + (this.getIndexOfSegment(segment) + 1) + " for process " + segment.getProcess().getReference_number());
             newNode.getSegment().setBase(0);
             System.out.println("Base: " + 0 + ", Limit: " + newNode.getSegment().getLimit());
+            System.out.println("Next node: base " + start.getNext().getBase() + " limit " + start.getNext().getLimit()  );
+            System.out.println("Next node allocated? " + start.getNext().isAllocated());
             //this.printMemory();
             return true;
         }else{ // if the memory contains holes and segments
         	Node curr = start;
         	while(curr != null) {
-        		if(!curr.isAllocated()) { // if the currents node is a hole
-        			if(curr.getLimit() < segment.getLimit() ) { // if the size of the hole is less than the size of the segment
+        		System.out.println("curr allocated? " + curr.isAllocated());
+        		if(curr.isAllocated() == false) { // if the currents node is a hole
+        			System.out.println("curr limit: " + curr.getLimit());
+        			System.out.println("segment limit: " + segment.getLimit());
+        			if(curr.getLimit() > segment.getLimit()) { // if the size of the hole is greater than the size of the segment
+        				System.out.println("yeet");
         				curr.getPrevious().setNext(newNode);
         				newNode.setNext(curr);
         				newNode.setPrevious(curr.getPrevious());
@@ -258,10 +330,11 @@ public class MemoryManagement {
         				return true;
         			}
         		}
-        	
+        		System.out.println("not pog");
         		curr = curr.getNext();
         	}
         	
+        	System.out.println("Not enough space to allocate this memory");
         	return false;
         }
         
@@ -270,7 +343,7 @@ public class MemoryManagement {
     }
     
     public void deallocateMemory(Segment segment, int size) {
-		if(!this.segmentAlreadyUsed(segment)) {
+		if(this.segmentAlreadyUsed(segment) == false) {
 			//throw new IllegalArgumentException("Segment not in main memory");
 			System.out.println("Segment not in main memory");
 		}else {
@@ -278,21 +351,26 @@ public class MemoryManagement {
 			while(temp != null) {
 				if(temp.isAllocated()) {
 					//if(temp.getSegment().getSegmentNumber() == segment.getSegmentNumber()) {
-					if(this.getIndexOfSegment(temp.getSegment()) == this.getIndexOfSegment(segment)) {
-						segment.setLimit(segment.getLimit()-size);
-						temp.setLimit(segment.getLimit());
-						if(segment.getLimit() == 0) { // if the size of the segment is now 0, remove it from the LL
-							System.out.println("Segment has a size of 0");
-						}else { // else, create a hole with the size of memory removed, and set that to be the next node
-							Node newNext = new Node(temp.getNext(), temp, false);
-							temp.setNext(newNext);
-							newNext.setLimit(size);
-							newNext.setBase(segment.getLimit());
-							System.out.println(size + " bytes successfully deallocated from memory");
-							//System.out.println("Segment " + segment.getSegmentNumber() + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
-							System.out.println("Segment " + this.getIndexOfSegment(segment) + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
-							System.out.println("Next node (hole): Base:" + newNext.getBase() + " Limit: " + newNext.getLimit() );
+					if((this.getIndexOfSegment(temp.getSegment())+1) == (this.getIndexOfSegment(segment)+1) && temp.getSegment().getProcess() == segment.getProcess()) {
+						if(temp.getLimit() >= size) {
+							segment.setLimit(segment.getLimit()-size);
+							temp.setLimit(segment.getLimit());
+							if(segment.getLimit() == 0) { // if the size of the segment is now 0, remove it from the LL
+								System.out.println("Segment has a size of 0");
+							}else { // else, create a hole with the size of memory removed, and set that to be the next node
+								Node newNext = new Node(temp.getNext(), temp, false);
+								temp.setNext(newNext);
+								newNext.setLimit(size);
+								newNext.setBase(segment.getLimit());
+								System.out.println(size + " bytes successfully deallocated from memory");
+								//System.out.println("Segment " + segment.getSegmentNumber() + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
+								System.out.println("Segment " + (this.getIndexOfSegment(segment)+1) + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
+								System.out.println("Next node (hole): Base:" + newNext.getBase() + " Limit: " + newNext.getLimit() );
+							}
+						}else {
+							System.out.println("Amount to deallocate > amount in segment!");
 						}
+
 					}
 				}
 				temp = temp.getNext();
@@ -320,5 +398,12 @@ public class MemoryManagement {
     }
 	
     
+    public void mergeHoles() {
+    	
+    }
+    
+    public void mergeProcesses() {
+    	
+    }
 	
 }

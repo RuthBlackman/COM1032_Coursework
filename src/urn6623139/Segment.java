@@ -16,7 +16,6 @@ public class Segment {
 	
 	private Process process;
 	
-    private Hole hole;
 
     private List<Process> sharedWith;
 	
