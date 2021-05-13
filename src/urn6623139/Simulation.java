@@ -39,20 +39,20 @@ public class Simulation {
 		
 		//String example2  = "2, 100, 200, 3, 300";
 		
-		String example2 = "1, -25, -50, -1";
-		memManager.parseExample(example2);
+		//String example2 = "1, -25, -50, -1";
+		//memManager.parseExample(example2);
 		//memManager.printMemory();
 		
 		//System.out.println("\n");
 		
 		
-		/*
-		String example3 = "3, 500, 200, 3";
+		
+		String example3 = "1, 0,0, 1";
 		memManager.parseExample(example3);
 		memManager.printMemory();
 		
 		
-		System.out.println("\n");
+		System.out.println("\n");/*
 
 		
 		
@@ -75,7 +75,16 @@ public class Simulation {
 		/*
 		 * Example A.2.1
 		 */
-		System.out.println("");
+
+		/*
+		System.out.println("Start Code Location A.2.1 read-write protection");
+		System.out.println("...filename and line number...");
+		System.out.println("End Code Location A.2.1 read-write protection");	
+		
+		System.out.println("Start Example A.2.1 read-write protection");
+		System.out.println("...The example...");
+		System.out.println("End Example A.2.1 read-write protection");	
+		*/
 		
 		/*
 		String example2 = "1, [100; 0], [200; 0; 2; 3; 4], 10";
@@ -93,27 +102,56 @@ public class Simulation {
 		 * Example A.2.2
 		 */
 		
+		/*
+		System.out.println("Start Code Location A.2.2 sharing of segments");
+		System.out.println("...filename and line number...");
+		System.out.println("End Code Location A.2.2 sharing of segments");
+		
+		System.out.println("Start Example A.2.2 sharing of segments");
+		System.out.println("...the example...");
+		System.out.println("End Example A.2.2 sharing of segments");
+		*/
 		
 		/*
 		 * Example A.2.3
 		 */
 		
+		/*
+		System.out.println("Start Example A.2.3");
+		System.out.println("End Example A.2.3");
+		*/
 		
 		/*
 		 * Example A.3.1
 		 */
 		
 		/*
+		System.out.println("Start Code Location A.3.1 TLB");
+		System.out.println("...filename and line number...");
+		System.out.println("End Code Location A.3.1 TLB");
+		
+		System.out.println("Start Example A.3.1 TLB working");
+		System.out.println("...the example...");
+		System.out.println("End Example A.3.1 TLB");
+		
+		System.out.println("Start Example A.3.1 TLB miss");
+		System.out.println("...the example...");
+		System.out.println("End Example A.3.1 TLB miss");
+		*/
+		
+		/*
 		 * Example A.3.2
 		 */
 		
-		
 		/*
-		 * 
-		 */
+		System.out.println("Start Code Location A.3.2 Compaction");
+		System.out.println("...filename and line number...");
+		System.out.println("End Code Location A.3.2 Compaction");
 		
-		
-		
+		System.out.println("Start Example A.3.2 Compaction");
+		System.out.println("...the example...");
+		System.out.println("End Example A.3.2 Compaction");
+		*/		
 	}
 	
 	

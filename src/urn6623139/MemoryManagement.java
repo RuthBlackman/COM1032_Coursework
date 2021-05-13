@@ -216,7 +216,7 @@ public class MemoryManagement {
 			this.deallocateMemory(segment, numBytes);
 		}else if (numBytes > 0) {
 			System.out.println("Allocating: " + numBytes);
-			this.allocateMemory(segment);
+			this.allocateMemory(segment, numBytes);
 		}
 		
 		System.out.println("\n");
@@ -240,13 +240,17 @@ public class MemoryManagement {
 	}
 	
 
-	public void allocateMemory(Segment segment) {
+	public void allocateMemory(Segment segment, int numBytes) {
 		if(this.segmentAlreadyUsed(segment)) {
 			System.out.println("Segment in linked list");
+			if(!this.firstFitInsert(segment, numBytes)) {
+				System.out.println("fail");
+			}else {
+				System.out.println("Success");
+			}
 		}else {
 			System.out.println("Segment not already in linked list");
-			boolean placed = this.firstFitInsert(segment);
-			if(!placed) {
+			if(!this.firstFitInsert(segment, numBytes)) {
 				System.out.println("fail");
 			}else {
 				System.out.println("Success");
@@ -282,13 +286,14 @@ public class MemoryManagement {
     }
     
     
-    public boolean firstFitInsert(Segment segment) {
+    public boolean firstFitInsert(Segment segment, int numBytes) {
         Node newNode = new Node(null, null, true);
         newNode.setSegment(segment);
         Node temp = start;
 
         if(!start.isAllocated()){ // if the memory only contains one hole - no segments yet
-            start = newNode;
+            System.out.println("No segment in memory already - adding segment to the start");
+        	start = newNode;
             end = temp;
             previous = null;
             
@@ -310,36 +315,99 @@ public class MemoryManagement {
             //this.printMemory();
             return true;
         }else{ // if the memory contains holes and segments
-        	Node curr = start;
-        	while(curr != null) {
-        		System.out.println("curr allocated? " + curr.isAllocated());
-        		if(curr.isAllocated() == false) { // if the currents node is a hole
-        			System.out.println("curr limit: " + curr.getLimit());
-        			System.out.println("segment limit: " + segment.getLimit());
-        			if(curr.getLimit() > segment.getLimit()) { // if the size of the hole is greater than the size of the segment
-        				System.out.println("yeet");
-        				curr.getPrevious().setNext(newNode);
-        				newNode.setNext(curr);
-        				newNode.setPrevious(curr.getPrevious());
-        				curr.setPrevious(newNode);
-        				
-        				newNode.setBase(newNode.getPrevious().getLimit());
-        				newNode.setLimit(segment.getLimit());
-        				curr.setBase(newNode.getLimit());
-        				curr.setLimit(curr.getLimit() - newNode.getLimit());
-        				return true;
-        			}
-        		}
-        		System.out.println("not pog");
-        		curr = curr.getNext();
+        	System.out.println("Other segment/s already in memory");
+        	if(this.segmentAlreadyUsed(segment)) { // if segment is already in main memory
+            	System.out.println("Segment already in memory");
+        		Node curr = start;
+            	while(curr != null) {
+            		if(curr.isAllocated() == true && curr.getSegment() == segment) {
+            			System.out.println("found segment in memory");
+            			if(curr.getNext().isAllocated() == false) { // if the node after the current node (where the segment is) is a hole
+            				System.out.println("node after segment is a hole");
+            				if(curr.getNext().getLimit() >= numBytes) { // if hole >= amount of memory to allocate
+            					System.out.println("hole >= amount of memory to allocate");
+            					curr.setLimit(curr.getLimit()+numBytes);
+            					curr.getNext().setBase(curr.getSegment().getBase() + curr.getSegment().getLimit());
+            					curr.getNext().setLimit(curr.getNext().getLimit() -  numBytes);
+            					return true;
+            				}else { // if hole < segment, then remove segment and allocate it in another location		//need to adapt for when the segment can't be reallocated because of space issues
+            					System.out.println("hole < amount of memory to allocate");
+            					temp.setBase(curr.getSegment().getBase());
+            					temp.setLimit(curr.getSegment().getLimit());
+            					
+            					curr.getNext().setPrevious(curr.getPrevious());
+            					curr.getNext().setBase(curr.getSegment().getBase());
+            					curr.getNext().setLimit(curr.getNext().getLimit() + curr.getSegment().getLimit());
+            					
+            					this.firstFitInsert(segment, numBytes); 
+            				}
+            			}else { //if the node after the current node (where the segment is) is already allocated  // ignored notes for this, so will need to change 
+        					System.out.println("Node after segment is already allocated");
+        					System.out.println("curr base: " + curr.getBase() + ", limit: " + curr.getLimit());
+        					temp.setBase(curr.getSegment().getBase() );
+        					temp.setLimit(curr.getSegment().getLimit() + numBytes);
+        					
+        					System.out.println("Temp base: " + temp.getBase() + ", limit: " + temp.getLimit());
+        					
+        					/*
+        					curr.getNext().setPrevious(curr.getPrevious());
+        					curr.getNext().setBase(curr.getSegment().getBase());
+        					curr.getNext().setLimit(curr.getNext().getLimit() + curr.getSegment().getLimit());
+        					*/
+        					while(curr != null) {
+        						if(curr.isAllocated() ==false) {
+        							if(curr.getLimit() < temp.getLimit()) {
+        								//curr.getPrevious().setNext(temp);
+        								//temp.setBase(curr.getPrevious().getBase() + curr.getPrevious().getLimit());
+        								//temp.setLimit(temp.getBase() + numBytes);
+        								//temp.setPrevious(curr);
+        								//curr.setBase(temp.getBase() + temp.getLimit());
+        								//curr.setLimit(curr.getBase() + curr.getLimit());
+        								
+        								return true;
+        							}
+        						}
+        						curr = curr.getNext();
+        					}
+        					return false;
+        					
+        					
+        					//this.firstFitInsert(segment, numBytes); 
+            			}
+            		}
+            		curr = curr.getNext();
+            	}
+        	}else { // if segment is not already in memory
+            	System.out.println("Segment not aleady in memory");
+        		Node curr = start;
+            	while(curr != null) {
+            		System.out.println("curr allocated? " + curr.isAllocated());
+            		if(curr.isAllocated() == false) { // if the currents node is a hole
+            			System.out.println("curr limit: " + curr.getLimit());
+            			System.out.println("segment limit: " + segment.getLimit());
+            			if(curr.getLimit() > segment.getLimit()) { // if the size of the hole is greater than the size of the segment
+            				System.out.println("yeet");
+            				curr.getPrevious().setNext(newNode);
+            				newNode.setNext(curr);
+            				newNode.setPrevious(curr.getPrevious());
+            				curr.setPrevious(newNode);
+            				
+            				newNode.setBase(newNode.getPrevious().getLimit());
+            				newNode.setLimit(segment.getLimit());
+            				curr.setBase(newNode.getLimit());
+            				curr.setLimit(curr.getLimit() - newNode.getLimit());
+            				return true;
+            			}
+            		}
+            		System.out.println("not pog");
+            		curr = curr.getNext();
+            	}
+
         	}
         	
         	System.out.println("Not enough space to allocate this memory");
         	return false;
         }
-        
-        
-        
     }
     
     public void deallocateMemory(Segment segment, int size) {
