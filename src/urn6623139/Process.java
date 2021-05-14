@@ -3,8 +3,6 @@ package urn6623139;
 import java.util.ArrayList;
 import java.util.List;
 
-//import java.util.Arrays;
-
 public class Process {
 
     private int reference_number;
@@ -25,18 +23,6 @@ public class Process {
         return this.reference_number;
     }
     
-    /*
-    public int getIndexOfSegment(Segment segment) {
-    	int index = 0;
-    	for(Segment s : this.segments) {
-    		if(s == segment) {
-    			return index;
-    		}
-    		index++;
-    	}
-    	return -1;
-    }
-    */
     
     public List<Segment> getListSegments(){
     	return this.segments;
