@@ -41,4 +41,15 @@ public class Process {
     public List<Segment> getListSegments(){
     	return this.segments;
     }
+    
+    public void printSegments() {
+    	for(Segment s : this.segments) {
+    		System.out.println("base: " + s.getBase() + " limit: "+ s.getLimit());
+    	}
+    }
+    
+    public boolean removeSegment(Segment segment) {
+    	boolean removed = this.segments.remove(segment);
+    	return removed;
+    }
 }

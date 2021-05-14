@@ -33,26 +33,36 @@ public class Simulation {
 		memManager.parseExample(example1);
 		
 		//memManager.printMemory();
-		
+		memManager.testBaseLimit();
 		
 		//System.out.println("\n");
 		
-		//String example2  = "2, 100, 200, 3, 300";
+		//String example2  = "1, 100, 200, 3";
 		
-		//String example2 = "1, -25, -50, -1";
-		//memManager.parseExample(example2);
+		String example2 = "1, -25, -50, -1";
+		
+		//String example2 = "1, 10,10,0";
+		memManager.parseExample(example2);
+		memManager.testBaseLimit();
 		//memManager.printMemory();
 		
 		//System.out.println("\n");
 		
 		
 		
-		String example3 = "1, 0,0, 1";
-		memManager.parseExample(example3);
+		//String example3 = "1, 0,1, 1";
+		//memManager.parseExample(example3);
+		//memManager.printMemory();
+		
+		
+		
+		System.out.println("\n");
+		
+		memManager.compaction();
 		memManager.printMemory();
+		memManager.testBaseLimit();
 		
-		
-		System.out.println("\n");/*
+		/*
 
 		
 		
@@ -146,10 +156,14 @@ public class Simulation {
 		/*
 		System.out.println("Start Code Location A.3.2 Compaction");
 		System.out.println("...filename and line number...");
+		System.out.println("Filename: MemoryManagement.java");
+		System.out.println("Line number: 539");
 		System.out.println("End Code Location A.3.2 Compaction");
 		
 		System.out.println("Start Example A.3.2 Compaction");
 		System.out.println("...the example...");
+		memManager.compaction();
+		memManager.printMemory()
 		System.out.println("End Example A.3.2 Compaction");
 		*/		
 	}

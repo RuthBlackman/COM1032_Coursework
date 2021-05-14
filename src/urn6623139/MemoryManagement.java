@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class MemoryManagement {
 
@@ -168,11 +169,11 @@ public class MemoryManagement {
 			if(entry.getKey().getReference_number() == proc.getReference_number()) {
 				processAlreadyInMemory = true;
 				for(Segment s : entry.getValue()) {
-					if((this.getIndexOfSegment(s)+1) == segment_number) {
+					if((this.getIndexOfSegment(s)) == (segment_number-1)) { //segment 1 is stored at index 0 
 						System.out.println("segment already in memory");
 						segmentForProcessAlreadyInMemory = true;
 						a = s;
-						System.out.println("a: base: " + a.getBase() + " limit: " + a.getLimit());
+						System.out.println("a: "+ (this.getIndexOfSegment(a)+1) + " base: " + a.getBase() + " limit: " + a.getLimit());
 					}
 				}
 				//if((this.getIndexOfSegment(entry.getValue()) + 1) == segment_number) {
@@ -221,7 +222,6 @@ public class MemoryManagement {
 		
 		System.out.println("\n");
 		
-		//this.deallocateMemory(segment, 20);
 		this.printMemory();
 		}
 	}
@@ -290,9 +290,11 @@ public class MemoryManagement {
         Node newNode = new Node(null, null, true);
         newNode.setSegment(segment);
         Node temp = start;
-
-        if(!start.isAllocated()){ // if the memory only contains one hole - no segments yet
-            System.out.println("No segment in memory already - adding segment to the start");
+        
+        System.out.println("num seg nodes: " + this.numSegmentNodes());
+     
+        if(!start.isAllocated() && (this.numSegmentNodes() ==0) ){ // if the memory only contains one hole - no segments yet
+            System.out.println("No segments in memory already - adding segment to the start");
         	start = newNode;
             end = temp;
             previous = null;
@@ -301,7 +303,7 @@ public class MemoryManagement {
             start.setBase(0);
             start.setLimit(newNode.getSegment().getLimit());
             
-            end.setBase(start.getLimit());
+            end.setBase(start.getLimit() +start.getBase());
             end.setLimit(end.getLimit() - start.getLimit());
            
             end.setPrevious(start);
@@ -332,47 +334,61 @@ public class MemoryManagement {
             					return true;
             				}else { // if hole < segment, then remove segment and allocate it in another location		//need to adapt for when the segment can't be reallocated because of space issues
             					System.out.println("hole < amount of memory to allocate");
-            					temp.setBase(curr.getSegment().getBase());
+            					temp.setBase(curr.getSegment().getBase() + curr.getSegment().getLimit());
             					temp.setLimit(curr.getSegment().getLimit());
             					
             					curr.getNext().setPrevious(curr.getPrevious());
-            					curr.getNext().setBase(curr.getSegment().getBase());
+            					curr.getNext().setBase(curr.getSegment().getBase() + curr.getSegment().getLimit());
             					curr.getNext().setLimit(curr.getNext().getLimit() + curr.getSegment().getLimit());
             					
             					this.firstFitInsert(segment, numBytes); 
             				}
             			}else { //if the node after the current node (where the segment is) is already allocated  // ignored notes for this, so will need to change 
         					System.out.println("Node after segment is already allocated");
-        					System.out.println("curr base: " + curr.getBase() + ", limit: " + curr.getLimit());
-        					temp.setBase(curr.getSegment().getBase() );
+        					System.out.println("curr base: " + curr.getBase() + ", limit: " + curr.getLimit() + ", previous: " + curr.getPrevious());
+        					
+        					newNode.setAllocation(false); //replace the segment with a hole
+        					newNode.setLimit(curr.getLimit());
+        					
+        					temp.setBase(curr.getSegment().getBase() + curr.getSegment().getLimit() );
         					temp.setLimit(curr.getSegment().getLimit() + numBytes);
+        					temp.getSegment().setBase(temp.getBase());
+        					temp.getSegment().setLimit(temp.getLimit());
         					
         					System.out.println("Temp base: " + temp.getBase() + ", limit: " + temp.getLimit());
+        					
+
+        					
+        					if(curr.getPrevious() == null) {
+        						newNode.setPrevious(null);
+        						start = newNode;
+        						newNode.setBase(0);
+        					}else {
+            					newNode.setBase(curr.getBase() + curr.getLimit());
+            					newNode.setPrevious(curr.getPrevious());
+            					curr.getPrevious().setNext(newNode);
+        					}
+        					
+        					newNode.setNext(curr.getNext()); 					
+        					curr.getNext().setPrevious(newNode);
+        					
+
+        					this.testBaseLimit();
+        					
         					
         					/*
         					curr.getNext().setPrevious(curr.getPrevious());
         					curr.getNext().setBase(curr.getSegment().getBase());
         					curr.getNext().setLimit(curr.getNext().getLimit() + curr.getSegment().getLimit());
         					*/
-        					while(curr != null) {
-        						if(curr.isAllocated() ==false) {
-        							if(curr.getLimit() < temp.getLimit()) {
-        								//curr.getPrevious().setNext(temp);
-        								//temp.setBase(curr.getPrevious().getBase() + curr.getPrevious().getLimit());
-        								//temp.setLimit(temp.getBase() + numBytes);
-        								//temp.setPrevious(curr);
-        								//curr.setBase(temp.getBase() + temp.getLimit());
-        								//curr.setLimit(curr.getBase() + curr.getLimit());
-        								
-        								return true;
-        							}
-        						}
-        						curr = curr.getNext();
-        					}
+        					
+        					if(curr.getSegment().getProcess().removeSegment(curr.getSegment())) {
+        						System.out.println("Segment removed");
+        						curr.getSegment().getProcess().printSegments();
+        						this.firstFitInsert(temp.getSegment(), 0); 
+        					};
         					return false;
         					
-        					
-        					//this.firstFitInsert(segment, numBytes); 
             			}
             		}
             		curr = curr.getNext();
@@ -391,10 +407,36 @@ public class MemoryManagement {
             				newNode.setNext(curr);
             				newNode.setPrevious(curr.getPrevious());
             				curr.setPrevious(newNode);
+            				Node nodePrevious = newNode.getPrevious();
+
+            				/*
+            				int newBaseLimit = nodePrevious.getLimit();
+            				int newBaseBase = nodePrevious.getBase(); 
+            				int newBase =  newBaseLimit + newBaseBase;
             				
-            				newNode.setBase(newNode.getPrevious().getLimit());
+            				newNode.setBase(newBase);
+            				*/
+            				//newNode.setBase(this.calculateNewBase(newNode, nodePrevious));
+            				newNode = this.calculateNewBase(newNode, nodePrevious);
+            				
+            				System.out.println("New node base: " + newNode.getBase());
             				newNode.setLimit(segment.getLimit());
-            				curr.setBase(newNode.getLimit());
+            				
+            				/*
+            				newBaseLimit = newNode.getLimit();
+            				newBaseBase = newNode.getBase();
+            				newBase =  newBaseLimit + newBaseBase; 
+            				//curr.setBase(newNode.getSegment().getLimit()+ newNode.getSegment().getBase() );
+            				*/
+            				
+            				
+            				//curr.setBase(newBase);
+            				
+            				//curr.setBase(this.calculateNewBase(curr, newNode));
+            				
+            				curr = this.calculateNewBase(curr, newNode);
+            				
+            				System.out.println("Hole base: " + curr.getBase());
             				curr.setLimit(curr.getLimit() - newNode.getLimit());
             				return true;
             			}
@@ -410,6 +452,25 @@ public class MemoryManagement {
         }
     }
     
+    public void testBaseLimit() {
+    	Node temp = this.start;
+    	StringBuffer memory = new StringBuffer("\n---------------------------------------------------------------------------------------------------\n");
+    	memory.append("\tMain Memory\n");
+    	memory.append("---------------------------------------------------------------------------------------------------\n");
+    	String A = "";
+    	while(temp != null) {
+    		if(temp.isAllocated()) {
+    			A = "A";
+    		}else {
+    			A = "H";
+    		}
+    		memory.append("[" + A + temp.getLimit() +"] Base = " + temp.getBase() + " limit = " + temp.getLimit());
+    		temp = temp.getNext();
+    	}
+    	memory.append("\n");
+    	System.out.println(memory.toString());
+    }
+    
     public void deallocateMemory(Segment segment, int size) {
 		if(this.segmentAlreadyUsed(segment) == false) {
 			//throw new IllegalArgumentException("Segment not in main memory");
@@ -419,7 +480,7 @@ public class MemoryManagement {
 			while(temp != null) {
 				if(temp.isAllocated()) {
 					//if(temp.getSegment().getSegmentNumber() == segment.getSegmentNumber()) {
-					if((this.getIndexOfSegment(temp.getSegment())+1) == (this.getIndexOfSegment(segment)+1) && temp.getSegment().getProcess() == segment.getProcess()) {
+					if((this.getIndexOfSegment(temp.getSegment())+1) == (this.getIndexOfSegment(segment)+1) && temp.getSegment().getProcess().getReference_number() == segment.getProcess().getReference_number()) {
 						if(temp.getLimit() >= size) {
 							segment.setLimit(segment.getLimit()-size);
 							temp.setLimit(segment.getLimit());
@@ -429,10 +490,19 @@ public class MemoryManagement {
 								Node newNext = new Node(temp.getNext(), temp, false);
 								temp.setNext(newNext);
 								newNext.setLimit(size);
-								newNext.setBase(segment.getLimit());
+								/*
+								int newBaseBase = temp.getBase();
+								int newBaseLimit = temp.getLimit();
+								int newBase = newBaseBase + newBaseLimit;
+								//newNext.setBase(temp.getSegment().getBase() + temp.getSegment().getLimit() );
+								newNext.setBase(newBase);
+								*/
+								//newNext.setBase(this.calculateNewBase(newNext, temp));
+								newNext = this.calculateNewBase(newNext, temp);
+								
 								System.out.println(size + " bytes successfully deallocated from memory");
 								//System.out.println("Segment " + segment.getSegmentNumber() + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
-								System.out.println("Segment " + (this.getIndexOfSegment(segment)+1) + " Base: " + segment.getBase() + " Limit: " + segment.getLimit());
+								System.out.println("Segment " + (this.getIndexOfSegment(temp.getSegment())+1) + " Base: " + temp.getSegment().getBase() + " Limit: " + temp.getSegment().getLimit());
 								System.out.println("Next node (hole): Base:" + newNext.getBase() + " Limit: " + newNext.getLimit() );
 							}
 						}else {
@@ -466,7 +536,51 @@ public class MemoryManagement {
     }
 	
     
-    public void mergeHoles() {
+    public void compaction() {
+    	Node curr = this.start;
+    	
+  
+    	int totalHoleSize = 0;
+    	System.out.println("before while loop");
+    	while(curr.getNext() != null) {
+    		System.out.println("inside while loop");
+    		if(curr.isAllocated() == false) { // if current node is a hole
+    			System.out.println("curr base: " + curr.getBase() + " limit: " + curr.getLimit() );
+    			curr.getPrevious().setNext(curr.getNext());
+        		curr.getNext().setPrevious(curr.getPrevious());
+        		
+        		Node previous = curr.getPrevious();
+        		Node next = curr.getNext();
+        		
+        		next = this.calculateNewBase(next, previous);
+        		
+        		totalHoleSize += curr.getLimit();
+    		}
+        	curr = curr.getNext();
+    	}
+    	System.out.println("last node: " + curr.isAllocated() + " base: "+  curr.getBase() + " limit: " + curr.getLimit());
+    	curr.setLimit(curr.getLimit() + totalHoleSize);
+    	System.out.println("NEW last node: " + curr.isAllocated() + " base: "+  curr.getBase() + " limit: " + curr.getLimit());
+    	System.out.println("Total hole space to reallocate: " + totalHoleSize);
+    	
+
+    	//hole.setLimit(totalHoleSize);
+    	//hole.setBase(curr.getPrevious().getSegment().getBase() + curr.getPrevious().getSegment().getLimit());
+    	//hole.setAllocation(false);
+    	
+    	
+    }
+    
+    public Node calculateNewBase(Node nodeToChange, Node previousNode) {
+    	int newBaseLimit = previousNode.getLimit();
+    	int newBaseBase = previousNode.getBase();
+    	int newBase = newBaseLimit + newBaseBase;
+    	
+    	nodeToChange.setBase(newBase);
+    	return nodeToChange;
+    }
+    
+    public void insertHoles() {
     	
     }
     
@@ -474,4 +588,22 @@ public class MemoryManagement {
     	
     }
 	
+    
+    public void printActiveProcess() {
+    	for(Entry<Process, List<Segment>> entry : this.processesInMemory.entrySet()) {
+    		System.out.println("Process: " + entry.getKey() + ", list of segment: "+ entry.getValue());
+    	}
+    }
+    
+    public int numSegmentNodes() {
+    	Node curr = start;
+    	int numSegNodes = 0;
+    	while(curr != null) {
+    		if(curr.isAllocated()) {
+    			numSegNodes++;
+    		}
+    		curr = curr.getNext();
+    	}
+    	return numSegNodes;
+    }
 }
