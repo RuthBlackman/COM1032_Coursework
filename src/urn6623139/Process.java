@@ -3,19 +3,19 @@ package urn6623139;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+/**
  * Class that defines that attributes and methods of a process
  */
 public class Process {
 
-	/*
+	/**
 	 * Private attributes
 	 */
     private int reference_number;
     private List<Segment> segments;
    
 
-    /*
+    /**
      * Constructor for Process
      * @param reference_number
      * 				 A reference number (a unique identifier for that operation)
@@ -26,7 +26,7 @@ public class Process {
     	this.segments = new ArrayList<Segment>();
     }
     
-    /*
+    /**
      * Method to add a segment to the process's ArrayList of segments
      * 
      * @param segment 
@@ -37,7 +37,7 @@ public class Process {
     }
     
     
-    /*
+    /**
      * Method to get the process's reference number
      * 
      * @return reference number
@@ -47,7 +47,7 @@ public class Process {
     }
     
     
-    /*
+    /**
      * Method to get the list of the process's segments
      * 
      * @return list of segments
@@ -57,7 +57,7 @@ public class Process {
     }
     
     
-    /*
+    /**
      * Method to print the base and limit for each segment in the ArrayList of segments
      */
     public void printSegments() {
@@ -66,7 +66,7 @@ public class Process {
     	}
     }
     
-    /*
+    /**
      * Method to remove a segment from the process's ArrayList of segments
      * 
      * @param segment
