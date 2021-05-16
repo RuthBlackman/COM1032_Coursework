@@ -13,22 +13,33 @@ public class Segment {
 	 */
 	private int base;
 	private int limit;
-	private int readOnly; 
+	private boolean readWriteFlag; 
 	private Process process;
     private List<Process> sharedWith;
 	
-	/*
-	public Segment(int base, int limit, int readOnly) {
-		this.base = base;
-		this.limit = limit;
-		this.readOnly = readOnly;
-	}
-	*/
-	
     
+    /**
+     * Constructor for when only the limit of the segment is specified
+     * 
+     * In this case, it has taken as default that the read-write flag is true
+     */
     public Segment(Process proc,  int limit) {
     	this.process = proc;
     	this.limit = limit;
+    	this.readWriteFlag = true;
+    	this.sharedWith = new ArrayList<Process>();
+    }
+    
+    
+    /**
+     * Constructor for when the read-write flag is specified, along with the limit of the segment
+     */
+    public Segment(Process proc, int limit, int permission) {
+    	this.process = proc;
+    	this.limit = limit;
+    	
+    	this.setReadWriteFlag(permission);
+    	
     	this.sharedWith = new ArrayList<Process>();
     }
 
@@ -85,16 +96,41 @@ public class Segment {
     }
     
     
-    /*
-    public int isReadOnly() {
-    	return this.readOnly;
+    /**
+     * Method to get the read-write flag for the segment
+     * 
+     * @return boolean 
+     * 			true if the segment has read-write permissions
+     * 			false if the segment is read-only
+     */
+    
+    public boolean getReadWriteFlag() {
+    	return this.readWriteFlag;
     	
     }
     
-    public void setReadOnly(int permission) {
-    	this.readOnly = permission;
+    
+    /**
+     * Method to set the read-write flag for a segment
+     * 
+     * @param permission
+     * 			0 means the read-write flag is set to false
+     * 			1 means the read-write flag is set to true
+     */
+    public void setReadWriteFlag(int permission) {
+    	if(permission ==0) {
+    		this.readWriteFlag = false;
+    	}else if (permission == 1) {
+    		this.readWriteFlag = true;
+    	}else {
+    		throw new IllegalArgumentException("Read-write permission must be either 0 or 1");
+    	}
     }
-    */
+    
+    public void setReadWriteFlag(boolean flag) {
+    	this.readWriteFlag = flag;
+    }
+    
 }
 
 
