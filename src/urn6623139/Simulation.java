@@ -23,67 +23,21 @@ public class Simulation {
 		 * Example A.1.2
 		 */
 		System.out.println("Start Example A.1.2\n");
-
-		//int [] example1 = {1, 100, 200, 3};
-		//memManager.parseExample(Arrays.toString(example1).replace("[", "").replace("]", ""));
 		
+		String example1 = "1, 100, 100, 10";
+		memManager.parseExample(example1);
 		
+		String example2 = "2, 200";
+		memManager.parseExample(example2);
 		
-		//String example1 = "1, 100, 200, 3";
-		//memManager.parseExample(example1);
+		String example3 = "1, -40, 0,0";
+		memManager.parseExample(example3);
 		
-		//memManager.printMemory();
-		//memManager.testBaseLimit();
+		String example4 = "2, -10, 300";
+		memManager.parseExample(example4);
 		
-		System.out.println("\n");
-		
-		//String example2  = "1, 100, 200, 3";
-		
-		//String example3 = "1, -25, -20, -1";
-		
-		//String example3 = "1, 50, 0";
-		//memManager.parseExample(example2);
-		//memManager.parseExample(example3);
-		//memManager.testBaseLimit();
-		//memManager.printMemory();
-		
-		//System.out.println("\n");
-		
-		
-		
-		//String example3 = "1, 0,1, 1";
-		
-		//String example3 = "1, 0, 50,0";
-		//memManager.parseExample(example2);
-		//memManager.testBaseLimit();
-		
-		//String example4 = "1, 0,0,1";
-		//memManager.parseExample(example4);
-		//memManager.printMemory();
-		
-		
-		
-		System.out.println("\n");
-		
-		//memManager.compaction();
-		//memManager.printMemory();
-		//memManager.testBaseLimit();
-		
-		/*
-
-		
-		
-		String example4  = "2, 100, 200, 3";
-		memManager.parseExample(Arrays.toString(example4).replace("[", "").replace("]", ""));
-		
-		
-		System.out.println("\n");
-		
-		String example5  = "2, 100, 200, 3";
-		memManager.parseExample(Arrays.toString(example5).replace("[", "").replace("]", ""));
-		
-*/
-		//manager.printInputs();
+		String example5 = "3, 180, 60";
+		memManager.parseExample(example5);
 		
 		System.out.println("\nEnd Example A.1.2");
 		
@@ -120,15 +74,7 @@ public class Simulation {
 		
 
 		
-		
-		/*
-		String example3 = "1, [10; 1], [-200; 0; 2; 5], 10";
-		memManager.parseExample(example3);
-		
-		String example4 = "3, [100; 0], [200; 0; 2; 3]";
-		memManager.parseExample(example4);
-		//memManager.printMemory();
-		*/
+
 		
 		/*
 		 * Example A.2.2
@@ -147,8 +93,18 @@ public class Simulation {
 		memManager.parseExample(example2);
 		
 		
+				
+		/*
+		String example3 = "1, [10; 1], [-200; 0; 2; 5], 10";
+		memManager.parseExample(example3);
+		
+		String example4 = "3, [100; 0], [200; 0; 2; 3]";
+		memManager.parseExample(example4);
+		//memManager.printMemory();
+		
 		System.out.println("End Example A.2.2 sharing of segments");
 		*/
+		
 		
 		/*
 		 * Example A.2.3

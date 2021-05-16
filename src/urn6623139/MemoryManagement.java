@@ -380,11 +380,14 @@ public class MemoryManagement {
             				System.out.println("Node after segment is already allocated");
         					System.out.println("curr base: " + curr.getBase() + ", limit: " + curr.getLimit() + ", previous: " + curr.getPrevious());
         					
+        					int holeLimit = curr.getLimit();
+        					System.out.println(holeLimit);
+        					
         					newNode.setAllocation(false); //replace the segment with a hole, with the same limit, base, previous node, and next node as the the segment in the memory
-        					newNode.setLimit(curr.getLimit());
+        					newNode.setLimit(holeLimit);
         					newNode.setBase(curr.getBase());
-        					newNode.setPrevious(curr.getPrevious());
-        					newNode.setNext(curr.getNext());
+        					//newNode.setPrevious(curr.getPrevious());
+        					//newNode.setNext(curr.getNext());
         					
         					
         					
@@ -392,11 +395,18 @@ public class MemoryManagement {
         						start = newNode;
         					}else {
         						curr.getPrevious().setNext(newNode);
+        						newNode.setPrevious(curr.getPrevious());
         					}
         					
+        					if(curr.getNext() == null) {
+        						end = newNode;
+        					}else {
+        						curr.getNext().setPrevious(newNode);
+        						newNode.setNext(curr.getNext());
+        					}
         					curr.getNext().setPrevious(newNode);
         					
-        			
+        					
         					
         					
         					//System.out.println("New hole base: " + newNode.getBase() + ", limit: " + newNode.getLimit());
@@ -407,32 +417,56 @@ public class MemoryManagement {
         					
         					//this.testBaseLimit();
 
-        					curr.setLimit(temp.getLimit() + numBytes);
+        					curr.setLimit(curr.getLimit() + numBytes);
         					
   
-        					System.out.println("Temp base: " + curr.getBase() + ", limit: " + curr.getLimit());
+        					//System.out.println("Temp base: " + curr.getBase() + ", limit: " + curr.getLimit());
    
         					//this.printMemory();
         					//this.testBaseLimit();
-        					       					
-        					Node tempHole = curr.getNext();
+        					       				
+        					System.out.println("Hole: base: " + newNode.getBase() + " limit: " +  newNode.getLimit());
+        					//System.out.println("Hole previous: base: " + newNode.getPrevious().getBase() + " limit: " +  newNode.getPrevious().getLimit());
+        					
+        					Node tempHole = start;
         					System.out.println("tempHole base " + tempHole.getBase() +  " limit "+  tempHole.getLimit() );
         					while(tempHole != null) {
-        						if(tempHole.isAllocated() == false) {
-        							if(tempHole.getLimit() >= temp.getLimit()) {
-                    					System.out.println("hole >= amount of memory to allocate");
+        						if(tempHole.isAllocated() == false && tempHole.getLimit() >= curr.getLimit()) {
+                    				/*	
+        							System.out.println("hole >= amount of memory to allocate");
                     					System.out.println("hole base: " + tempHole.getBase() + ", limit: "  + tempHole.getLimit());
-                    					curr.setBase(tempHole.getBase());
-                    					curr.setPrevious(tempHole.getPrevious());
-                    					tempHole.getPrevious().setNext(temp);
-                    					curr.setNext(tempHole);
-                    					tempHole.setPrevious(curr);
-                    					tempHole = this.calculateNewBase(tempHole, curr);
-                    					tempHole.setLimit(tempHole.getLimit() - curr.getLimit());
-                    					System.out.println("new hole base: " + tempHole.getBase() + ", limit: "  + tempHole.getLimit());
+                    					
+                    					
+                    					if(tempHole.getPrevious() == null) {
+                    						start = curr;
+                    						curr.setPrevious(null);
+                    					}else {
+                    						curr.setPrevious(tempHole.getPrevious());
+                    						tempHole.getPrevious().setNext(curr);
+                    					}
+                    					
+                    					if(tempHole.getNext() == null) {
+                    						end = curr;
+                    						curr.setNext(null);
+                    					}else {
+                    						curr.setNext(tempHole);
+                    						tempHole.getNext().setPrevious(curr);
+                    					}
+     
+                    					
+                    					tempHole.setLimit(tempHole.getLimit() - numBytes);
                     					return true;
-                    				
-        							}
+                    					*/
+        							int holeSize = tempHole.getLimit() - curr.getLimit();
+        							tempHole.setAllocation(true);
+        							tempHole.setSegment(curr.getSegment());
+        							tempHole.setLimit(curr.getLimit());
+        							Node newHole = new Node();
+        							newHole.setAllocation(false);
+        							newHole.setLimit(holeSize);
+        							newHole.setNext(tempHole.getNext());
+        							tempHole.setNext(newHole);
+        							return true;
         						}
         						tempHole = tempHole.getNext();
         					}
