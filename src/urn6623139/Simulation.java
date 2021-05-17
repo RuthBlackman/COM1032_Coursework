@@ -62,14 +62,7 @@ public class Simulation {
 		String example6 = "1, [100; 0], [200; 1], 10"; //allocate memory for 3 segments in process 1
 		memManager2.parseExample(example6);
 		System.out.println("\n");
-		
-		String example7 = "1, [100; 0]"; //try to allocate another 100 to segment 1, process 1
-		memManager2.parseExample(example7); // this example will not work because the segment is read only
-		System.out.println("\n");
-		
-		String example8 = "1, [100; 1]"; // try again to allocate another 100 to segment 1, process 1
-		memManager2.parseExample(example8); // this example will work because the read-write flag is now set to true
-		System.out.println("\n");
+		memManager2.printReadWriteStatus();
 		
 		System.out.println("End Example A.2.1 read-write protection");	
 		*/
@@ -101,10 +94,15 @@ public class Simulation {
 		System.out.println("End Example A.2.2 sharing of segments");
 		*/
 		
-		//String example9 = "1, [100; 0], [200; 0; 2; 3; 4], 10";
-		//memManager.parseExample(example9);
-		
-		
+		/*
+		String example9 = "1, [100; 0; 2]";
+		memManager.parseExample(example9);
+		String example10 = "2, [100; 0; 1]";
+		memManager.parseExample(example10);
+		System.out.println("\n");
+		String example11 = "1, [100;1]";
+		memManager.parseExample(example11);
+		*/
 		
 		/*
 		 * Example A.2.3
