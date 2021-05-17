@@ -12,7 +12,7 @@ public class Process {
 	 * Private attributes
 	 */
     private int reference_number;
-    private List<Segment> segments;
+    private List<Segment> segmentTable;
    
 
     /**
@@ -23,7 +23,7 @@ public class Process {
      */
     public Process(int reference_number) {
     	this.reference_number = reference_number;
-    	this.segments = new ArrayList<Segment>();
+    	this.segmentTable = new ArrayList<Segment>();
     }
     
     /**
@@ -33,7 +33,7 @@ public class Process {
      * 				Segment to add to the ArrayList
      */
     public void addProcessToSegment(Segment segment) { //need to add validation
-    	this.segments.add(segment);
+    	this.segmentTable.add(segment);
     }
     
     
@@ -53,7 +53,7 @@ public class Process {
      * @return list of segments
      */
     public List<Segment> getListSegments(){
-    	return this.segments;
+    	return this.segmentTable;
     }
     
     
@@ -61,7 +61,7 @@ public class Process {
      * Method to print the base and limit for each segment in the ArrayList of segments
      */
     public void printSegments() {
-    	for(Segment s : this.segments) {
+    	for(Segment s : this.segmentTable) {
     		System.out.println("base: " + s.getBase() + " limit: "+ s.getLimit());
     	}
     }
@@ -75,7 +75,7 @@ public class Process {
      * @return boolean of whether it has been removed
      */
     public boolean removeSegment(Segment segment) {
-    	boolean removed = this.segments.remove(segment);
+    	boolean removed = this.segmentTable.remove(segment);
     	return removed;
     }
 }

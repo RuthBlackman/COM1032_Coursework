@@ -126,11 +126,18 @@ public class Segment {
     		throw new IllegalArgumentException("Read-write permission must be either 0 or 1");
     	}
     }
+ 
     
-    public void setReadWriteFlag(boolean flag) {
-    	this.readWriteFlag = flag;
+    public void addProcessToSharedList(Process proc) {
+    	if(proc == null) {
+    		throw new IllegalArgumentException("Process cannot be null");
+    	}
+    	if(!(this.sharedWith.contains(proc))) {
+    		this.sharedWith.add(proc);
+    	}
+    	
     }
-    
+   
 }
 
 

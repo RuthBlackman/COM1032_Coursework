@@ -22,6 +22,8 @@ public class Simulation {
 		/*
 		 * Example A.1.2
 		 */
+		
+		/*
 		System.out.println("Start Example A.1.2\n");
 		
 		String example1 = "1, 100, 100, 10";
@@ -40,7 +42,7 @@ public class Simulation {
 		memManager.parseExample(example5);
 		
 		System.out.println("\nEnd Example A.1.2");
-		
+		*/
 		
 		
 		/*
@@ -57,25 +59,23 @@ public class Simulation {
 		System.out.println("Start Example A.2.1 read-write protection");
 		MemoryManagement memManager2 = new MemoryManagement(1024, 124);
 		
-		String example2 = "1, [100; 0], [200; 1], 10"; //allocate memory for 3 segments in process 1
-		memManager2.parseExample(example2);
+		String example6 = "1, [100; 0], [200; 1], 10"; //allocate memory for 3 segments in process 1
+		memManager2.parseExample(example6);
 		System.out.println("\n");
 		
-		String example3 = "1, [100; 0]"; //try to allocate another 100 to segment 1, process 1
-		memManager2.parseExample(example3); // this example will not work because the segment is read only
+		String example7 = "1, [100; 0]"; //try to allocate another 100 to segment 1, process 1
+		memManager2.parseExample(example7); // this example will not work because the segment is read only
 		System.out.println("\n");
 		
-		String example4 = "1, [100; 1]"; // try again to allocate another 100 to segment 1, process 1
-		memManager2.parseExample(example4); // this example will work because the read-write flag is now set to true
+		String example8 = "1, [100; 1]"; // try again to allocate another 100 to segment 1, process 1
+		memManager2.parseExample(example8); // this example will work because the read-write flag is now set to true
 		System.out.println("\n");
 		
 		System.out.println("End Example A.2.1 read-write protection");	
 		*/
 		
 
-		
-
-		
+				
 		/*
 		 * Example A.2.2
 		 */
@@ -89,12 +89,8 @@ public class Simulation {
 		System.out.println("...the example...");
 		
 		
-		String example2 = "1, [100; 0], [200; 0; 2; 3; 4], 10";
-		memManager.parseExample(example2);
+
 		
-		
-				
-		/*
 		String example3 = "1, [10; 1], [-200; 0; 2; 5], 10";
 		memManager.parseExample(example3);
 		
@@ -104,6 +100,10 @@ public class Simulation {
 		
 		System.out.println("End Example A.2.2 sharing of segments");
 		*/
+		
+		//String example9 = "1, [100; 0], [200; 0; 2; 3; 4], 10";
+		//memManager.parseExample(example9);
+		
 		
 		
 		/*
