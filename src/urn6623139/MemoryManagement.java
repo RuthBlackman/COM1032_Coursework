@@ -27,6 +27,9 @@ public class MemoryManagement {
 	private Node end; 
 	private Node previous;
 
+	
+	
+	
 	/*
 	 * Constructor for MemoryManagement
 	 * 
@@ -67,6 +70,9 @@ public class MemoryManagement {
 		Process proc;
 		int numBytes = 0;
 		int readWritePermissions = 1; // assume it is 1 unless the segment is shared or it specifies 0
+		
+		
+		
 		
 		int size = example.split(",").length;
 		
@@ -112,7 +118,10 @@ public class MemoryManagement {
 	
 		
 		//TODO: remove the print
+		
 		for (int i =1; i<size; i++){
+			List<Integer> segmentSharedWith =new ArrayList<Integer>();
+			
 			String string = comp[i].toString().replace("[" ,"").replace("]", "").replace(",", ";");
 			int numSemiColons = string.split("\\;", -1).length-1;			
 		    StringBuffer buff = new StringBuffer("");
@@ -143,6 +152,7 @@ public class MemoryManagement {
 							}
 							if(numFound > 2) {
 								buff.append(string.charAt(k-1)+ ", ");
+								segmentSharedWith.add(Integer.parseInt(String.valueOf(string.charAt(k-1))));
 							}
 							
 						}
@@ -242,6 +252,8 @@ public class MemoryManagement {
 		System.out.println("\n");
 		
 		this.printMemory();
+		
+		System.out.println(segmentSharedWith.toString());
 		}
 	}
 	
@@ -273,6 +285,7 @@ public class MemoryManagement {
 				System.out.println("Failure: memory not allocated!");
 			}else {
 				System.out.println("Memory successfully allocated!");
+				
 			}
 		}
 		

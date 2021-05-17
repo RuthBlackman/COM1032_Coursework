@@ -15,7 +15,7 @@ public class Segment {
 	private int limit;
 	private boolean readWriteFlag; 
 	private Process process;
-    private List<Process> sharedWith;
+    private List<Integer> sharedWithProcessIDs;
 	
     
     /**
@@ -27,7 +27,7 @@ public class Segment {
     	this.process = proc;
     	this.limit = limit;
     	this.readWriteFlag = true;
-    	this.sharedWith = new ArrayList<Process>();
+    	this.sharedWithProcessIDs = new ArrayList<Integer>();
     }
     
     
@@ -40,7 +40,7 @@ public class Segment {
     	
     	this.setReadWriteFlag(permission);
     	
-    	this.sharedWith = new ArrayList<Process>();
+    	this.sharedWithProcessIDs = new ArrayList<Integer>();
     }
 
     
@@ -128,12 +128,12 @@ public class Segment {
     }
  
     
-    public void addProcessToSharedList(Process proc) {
-    	if(proc == null) {
-    		throw new IllegalArgumentException("Process cannot be null");
+    public void addProcessToSharedList(int processID) {
+    	if(processID <= 0) {
+    		throw new IllegalArgumentException("Process cannot be 0 or less");
     	}
-    	if(!(this.sharedWith.contains(proc))) {
-    		this.sharedWith.add(proc);
+    	if(!(this.sharedWithProcessIDs.contains(processID))) {
+    		this.sharedWithProcessIDs.add(processID);
     	}
     	
     }
