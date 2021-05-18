@@ -23,7 +23,7 @@ public class Simulation {
 		 * Example A.1.2
 		 */
 		
-		
+		/*
 		System.out.println("Start Example A.1.2\n");
 		
 		String example1 = "1, 100, 100, 10";
@@ -42,7 +42,7 @@ public class Simulation {
 		memManager.parseExample(example5);
 		
 		System.out.println("\nEnd Example A.1.2");
-		
+		*/
 		
 		
 		/*
@@ -152,7 +152,9 @@ public class Simulation {
 		System.out.println("Start Example A.3.1 TLB miss");
 		memManager.printTLBMiss();
 		System.out.println("End Example A.3.1 TLB miss");
-		*/
+		/*
+		
+
 		
 		/*
 		 * Example A.3.2
@@ -177,7 +179,7 @@ public class Simulation {
 		System.out.println("After compaction");
 		memManager.printMemory();
 		System.out.println("End Example A.3.2 Compaction");
-		*/	
+		*/
 	}
 	
 	

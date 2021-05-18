@@ -24,13 +24,10 @@ public class MemoryManagement {
 	
 	private Map<Process, List<Segment> > processesInMemory;
 	
-
-	
 	private Node start;
 	private Node end; 
 	private Node previous;
 
-	
 	private TLB tlb;
 	
 	/*
@@ -53,13 +50,19 @@ public class MemoryManagement {
 		this.initaliseLinkedList();
 		
 	}
-
+	
+	
+	/**
+	 * Method to get the start node
+	 * 
+	 * @return start
+	 */
 	public Node getStart() {
 		return this.start;
 	}
 	
 	
-	/*
+	/**
 	 * Method to get the total size of the physical memory
 	 * 
 	 * @return total_bytes
@@ -69,7 +72,7 @@ public class MemoryManagement {
 	}
 
 	
-	/*
+	/**
 	 * Method to get the size of the OS
 	 * 
 	 *  @return os_size
@@ -79,7 +82,7 @@ public class MemoryManagement {
 	}
 
 	
-	/*
+	/**
 	 * Method to get the total usable space - used for allocating segments
 	 * 
 	 * @return user_space
@@ -254,14 +257,14 @@ public class MemoryManagement {
 		if(processAlreadyInMemory == false) {
 			//System.out.println("Process not already in memory");
 			//System.out.println("Putting process into hash map");
-			proc.addProcessToSegment(segment);
+			proc.addSegmentToSegmentTable(segment);
 			processesInMemory.put(proc, proc.getListSegments());
 			
 		}else { // process is already in memory, so the segment may be too
 			//System.out.println("Process in memory");
 			if(segmentForProcessAlreadyInMemory == false) { // segment is not in memory for that process
 				//System.out.println("Segment not in memory for that process");
-				proc.addProcessToSegment(segment);
+				proc.addSegmentToSegmentTable(segment);
 				processesInMemory.put(proc, proc.getListSegments());
 				
 			}else { // segment is in memory for that process
@@ -305,7 +308,12 @@ public class MemoryManagement {
 			this.deallocateMemory(segment, numBytes);
 		}else if (numBytes > 0) {
 			System.out.println("Allocating: " + numBytes);
-			this.allocateMemory(segment, numBytes);
+			//this.allocateMemory(segment, numBytes);
+			if(this.allocateMemory(segment, numBytes)) {
+				System.out.println("Memory successfully allocated!");
+			}else {
+				throw new RuntimeException("Error: not enough space!");
+			}
 		}
 		
 		System.out.println("\n");
@@ -314,8 +322,8 @@ public class MemoryManagement {
 	}
 	
 	
-	/*
-	 * Method used to initalise the liked list (physical memory)
+	/**
+	 * Method used to initalise the linked list (physical memory)
 	 * It adds a node (hole) to the memory, sets the start and nodes to be the hole
 	 */
 	public void initaliseLinkedList() {
@@ -328,31 +336,6 @@ public class MemoryManagement {
         this.end = startNode;
         this.start.setAllocation(false);
         
-	}
-	
-
-	public void allocateMemory(Segment segment, int numBytes) {
-		if(this.segmentAlreadyUsed(segment)) {
-			//System.out.println("Segment in linked list");
-			if(!this.firstFitInsert(segment, numBytes)) {
-				System.out.println("Failure: memory not allocated!");
-				throw new RuntimeException("Error: not enough space!");
-				
-			}else {
-				System.out.println("Memory successfully allocated!");
-			}
-		}else {
-			//System.out.println("Segment not already in linked list");
-			if(!this.firstFitInsert(segment, numBytes)) {
-				System.out.println("Failure: memory not allocated!");
-				throw new RuntimeException("Error: not enough space!");
-			}else {
-				System.out.println("Memory successfully allocated!");
-				this.removeSizeZeroSegments();
-				
-			}
-		}
-		
 	}
 	
     public int getIndexOfSegment(Segment segment) {
@@ -392,7 +375,7 @@ public class MemoryManagement {
     }
     
     
-    public boolean firstFitInsert(Segment segment, int numBytes) {
+    public boolean allocateMemory(Segment segment, int numBytes) {
         Node newNode = new Node(null, null, true);
         newNode.setSegment(segment);
         Node temp = start;
@@ -441,7 +424,7 @@ public class MemoryManagement {
             					curr.getNext().setBase(curr.getSegment().getBase() + curr.getSegment().getLimit());
             					curr.getNext().setLimit(curr.getNext().getLimit() + curr.getSegment().getLimit());
             					
-            					this.firstFitInsert(segment, numBytes); 
+            					this.allocateMemory(segment, numBytes); 
             				}
 						}else { //if the node after the current node (the segment) is already allocated 
             				System.out.println("Temp base: " + temp.getBase() + " limit: " + temp.getLimit()); // temp = start node
@@ -648,6 +631,16 @@ public class MemoryManagement {
     		}
         	curr = curr.getNext();
     	}
+    	
+    	if(!curr.isAllocated()) {
+    		curr.setLimit(curr.getLimit() + totalHoleSize);
+    	}
+    	else {
+    		Node n = new Node();
+    		n.setLimit(totalHoleSize);
+    		curr.setNext(n);
+    	}
+    	
     	/*
     	System.out.println("last node: " + curr.isAllocated() + " base: "+  curr.getBase() + " limit: " + curr.getLimit());
     	curr.setLimit(curr.getLimit() + totalHoleSize);
@@ -751,6 +744,11 @@ public class MemoryManagement {
     	}
     }
     
+    
+    /**
+     * Code for A.2.2: Shared segments
+     * 
+     */
     public void sharedSegmentReadOnly(Segment segment) {
     	if(segment.hasSharedList() && segment.getReadWriteFlag() == true) {
     		throw new RuntimeException("Shared segment must be read only!");
@@ -805,6 +803,13 @@ public class MemoryManagement {
     	return segmentsInMemory;
     }
     
+    
+    
+    
+    /**
+     * Code for A.3.1:  TLB
+     * 
+     */
     public void printTLBWorking() {
     	List<Segment> segmentsInMemory = this.getListSegmentsInMemory();
     	Segment segmentToCheck = null;
