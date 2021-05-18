@@ -291,11 +291,12 @@ public class MemoryManagement {
 			//	throw new IllegalArgumentException("Shared segment must be read-only!");
 			//}
 		}
-		
+		/*
 		if(this.checkIfSharedSegmentInMemory(segment)) {
 			System.out.println("shared segment exists");
 			break;
 		}
+		*/
 		
 		
 		if(numBytes < 0) {

@@ -23,7 +23,7 @@ public class Simulation {
 		 * Example A.1.2
 		 */
 		
-		/*
+		
 		System.out.println("Start Example A.1.2\n");
 		
 		String example1 = "1, 100, 100, 10";
@@ -38,11 +38,11 @@ public class Simulation {
 		String example4 = "2, -10, 300";
 		memManager.parseExample(example4);
 		
-		String example5 = "3, 180, 60";
+		String example5 = "3, 180";
 		memManager.parseExample(example5);
 		
 		System.out.println("\nEnd Example A.1.2");
-		*/
+		
 		
 		
 		/*
