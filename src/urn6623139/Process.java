@@ -15,7 +15,7 @@ public class Process {
     private List<Segment> segmentTable;
    
 
-    /**
+    /*
      * Constructor for Process
      * @param reference_number
      * 				 A reference number (a unique identifier for that operation)
@@ -32,7 +32,7 @@ public class Process {
      * @param segment 
      * 				Segment to add to the ArrayList
      */
-    public void addProcessToSegment(Segment segment) { //need to add validation
+    public void addSegmentToSegmentTable(Segment segment) { //need to add validation
     	this.segmentTable.add(segment);
     }
     
@@ -62,7 +62,7 @@ public class Process {
      */
     public void printSegments() {
     	for(Segment s : this.segmentTable) {
-    		System.out.println("base: " + s.getBase() + " limit: "+ s.getLimit());
+    		System.out.println("Segment " + s.getSegmentID()+ " base: " + s.getBase() + " limit: "+ s.getLimit());
     	}
     }
     

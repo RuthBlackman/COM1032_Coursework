@@ -41,13 +41,6 @@ class Node{
 		this.allocated = allocated;
 	}
 	
-	public Node(Node n) {
-		this.next = n.getNext();
-		this.previous = n.getPrevious();
-		this.base = n.getBase();
-		this.limit = n.getLimit();
-		this.allocated = n.isAllocated();
-	}
 	
 	/**
 	 * Method to get the base of a node

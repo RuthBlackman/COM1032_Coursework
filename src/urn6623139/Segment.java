@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * 
  * Class to set the attributes and methods of a segment
  */
 public class Segment {
@@ -129,6 +130,24 @@ public class Segment {
     	}
     }
  
+ 
+    /**
+     * Getter and setter for segment ID
+     * 
+     * @return
+     */
+    public int getSegmentID() {
+    	return this.segmentID;
+    }
+    
+    public void setSegmentID(int id) {
+    	this.segmentID = id;
+    }
+    
+    
+    
+    
+    
     
     public void addProcessToSharedList(List<Integer> segmentSharedWith) {
     	for(int id : segmentSharedWith) {
@@ -172,13 +191,7 @@ public class Segment {
     	return false;
     }
     
-    public int getSegmentID() {
-    	return this.segmentID;
-    }
-    
-    public void setSegmentID(int id) {
-    	this.segmentID = id;
-    }
+
     
 }
 
