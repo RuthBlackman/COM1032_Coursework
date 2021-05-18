@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 
 
@@ -30,7 +31,7 @@ public class MemoryManagement {
 	private Node previous;
 
 	
-	
+	private TLB tlb;
 	
 	/*
 	 * Constructor for MemoryManagement
@@ -47,12 +48,17 @@ public class MemoryManagement {
 
 		this.processesInMemory = new HashMap<Process, List<Segment> >();
 
-		//this.TLB = new ArrayList<Segment>(10);
+		this.tlb = new TLB(user_space, this);
 		
 		this.initaliseLinkedList();
 		
 	}
 
+	public Node getStart() {
+		return this.start;
+	}
+	
+	
 	/*
 	 * Method to get the total size of the physical memory
 	 * 
@@ -191,6 +197,7 @@ public class MemoryManagement {
 			}else { //if the input is like: int [] example1 = {1, 100, 200, 3};
 				buff.append("Segment: "+ i + ", Size: " + comp[i].toString().replace("[", "").replace("]", ""));
 				numBytes = Integer.parseInt(comp[i].toString().replace("[", "").replace("]", ""));
+				readWritePermissions = 1;
 				System.out.println("read write permissions: " + readWritePermissions);
 			}
 			
@@ -222,7 +229,7 @@ public class MemoryManagement {
 		Segment segment = new Segment(proc, numBytes);
 		segment.setReadWriteFlag(readWritePermissions);
 		Segment a = null;
-		
+		System.out.println(segment.getReadWriteFlag());
 		
 		Boolean processAlreadyInMemory = false;
 		Boolean segmentForProcessAlreadyInMemory = false;
@@ -235,6 +242,8 @@ public class MemoryManagement {
 						segmentForProcessAlreadyInMemory = true;
 						System.out.println(s.getReadWriteFlag());
 						a = s;
+						a.setReadWriteFlag(readWritePermissions);
+						System.out.println(a.getReadWriteFlag());
 						//System.out.println("a: "+ (this.getIndexOfSegment(a)+1) + " base: " + a.getBase() + " limit: " + a.getLimit());
 					}
 				}
@@ -258,8 +267,13 @@ public class MemoryManagement {
 			}else { // segment is in memory for that process
 				System.out.println("Segment already in memory for that process");
 				//segment.setReadWriteFlag(a.getReadWriteFlag());
+				System.out.println("OLD: " + a.getSharedProcesses());
 				segment = a;
 				segment.setReadWriteFlag(readWritePermissions);
+				segment.emptySharedList();
+				segment.addProcessToSharedList(segmentSharedWith);
+				System.out.println("NEW: "+ segment.getSharedProcesses());
+				
 		//		System.out.println("segment r/w: " + a.getReadWriteFlag());
 		//		if(this.checkReadWrite(segment) == false) { return; }
 				
@@ -267,14 +281,15 @@ public class MemoryManagement {
 			}
 		}
 		
-		segment.setSegmentID(this.getIndexOfSegment(segment));
+		segment.setSegmentID(this.getSegmentID(segment));
 		segment.addProcessToSharedList(segmentSharedWith);
 		
 		if(segment.hasSharedList()) {
-			if(segment.getReadWriteFlag()) {
-				System.out.println(segment.getReadWriteFlag());
-				throw new IllegalArgumentException("Shared segment must be read-only!");
-			}
+			this.sharedSegmentReadOnly(segment);
+			//if(segment.getReadWriteFlag()) {
+			//	System.out.println(segment.getReadWriteFlag());
+			//	throw new IllegalArgumentException("Shared segment must be read-only!");
+			//}
 		}
 		
 		if(this.checkIfSharedSegmentInMemory(segment)) {
@@ -332,6 +347,7 @@ public class MemoryManagement {
 				throw new RuntimeException("Error: not enough space!");
 			}else {
 				System.out.println("Memory successfully allocated!");
+				this.removeSizeZeroSegments();
 				
 			}
 		}
@@ -495,7 +511,7 @@ public class MemoryManagement {
         		Node curr = start;
             	while(curr != null) {
             		if(curr.isAllocated() == false) { // if the currents node is a hole
-            			if(curr.getLimit() > segment.getLimit()) { // if the size of the hole is greater than the size of the segment
+            			if(curr.getLimit() >= segment.getLimit()) { // if the size of the hole is greater than the size of the segment
 
             				curr.getPrevious().setNext(newNode);
             				newNode.setNext(curr);
@@ -544,7 +560,6 @@ public class MemoryManagement {
     
     public void deallocateMemory(Segment segment, int size) {
 		if(this.segmentAlreadyUsed(segment) == false) {
-			System.out.println("Segment not in main memory");
 			throw new RuntimeException("Failure: segment not in main memory!");
 		}else {
 			Node temp = start;
@@ -574,7 +589,8 @@ public class MemoryManagement {
 								
 							}
 						}else {
-							System.out.println("Amount to deallocate > amount in segment!");
+							throw new RuntimeException("Amount to deallocate > amount in segment!");
+							
 						}
 
 					}
@@ -708,23 +724,40 @@ public class MemoryManagement {
     }
     */
     
+    public void removeSizeZeroSegments() {
+    	Node temp = start;
+    	while(temp != null) {
+    		if(temp.isAllocated() && temp.getLimit() == 0) {
+    			System.out.println("ZERO");
+    		}
+    		temp = temp.getNext();
+    	}
+    }
     
     public void printReadWriteStatus() {
+    	System.out.println("\n----------------------------------\nRead-Write status for each segment\n----------------------------------\n");
     	Node temp = start;
     	while(temp != null) {
     		if(temp.isAllocated()) {
     			if(temp.getSegment().getReadWriteFlag() == true) {
-    				System.out.println("Segment " + this.getSegmentID(temp.getSegment()) + " for process " + temp.getSegment().getProcess().getReference_number() + " is read-only.");
-    			}else {
     				System.out.println("Segment " + this.getSegmentID(temp.getSegment()) + " for process " + temp.getSegment().getProcess().getReference_number() + " is read-write.");
+    				
+    			}else {
+    				System.out.println("Segment " + this.getSegmentID(temp.getSegment()) + " for process " + temp.getSegment().getProcess().getReference_number() + " is read-only.");
     			}
     		}
     		temp = temp.getNext();
     	}
     }
     
+    public void sharedSegmentReadOnly(Segment segment) {
+    	if(segment.hasSharedList() && segment.getReadWriteFlag() == true) {
+    		throw new RuntimeException("Shared segment must be read only!");
+    	}
+    }
     
     public boolean checkIfSharedSegmentInMemory(Segment segment){
+    	
     	Node temp = start;
     	while(temp != null) {
     		if(temp.isAllocated() == true && (this.getIndexOfSegment(temp.getSegment()) == this.getIndexOfSegment(segment))) {
@@ -747,9 +780,56 @@ public class MemoryManagement {
     }
  
     
+    public void printSharedSegments() {
+    	System.out.println("\n----------------------------------\nSegments that are shared\n----------------------------------\n");
+    	Node temp = start;
+    	while(temp != null) {
+    		if(temp.isAllocated() == true && temp.getSegment().hasSharedList()) {
+    			System.out.println("Segment " + temp.getSegment().getSegmentID() + " for process " + temp.getSegment().getProcess().getReference_number() + " is shared with " + temp.getSegment().getSharedProcesses());
+    		}
+    		temp = temp.getNext();
+    	}
+    }
     
 
+    public List<Segment> getListSegmentsInMemory(){
+    	List<Segment> segmentsInMemory = new ArrayList<Segment>();
+    	Node temp = start;
+    	while(temp != null) {
+    		if(temp.isAllocated() == true) {
+    			segmentsInMemory.add(temp.getSegment());
+    		}
+    		temp = temp.getNext();
+    	}
+    	return segmentsInMemory;
+    }
     
+    public void printTLBWorking() {
+    	List<Segment> segmentsInMemory = this.getListSegmentsInMemory();
+    	Segment segmentToCheck = null;
+    	Random rand = new Random();
+    	
+    	int testNumber = 5; //number of times to run the ting
+    	
+    	for(int i = 0; i <= testNumber; i++ ) {
+    		
+    		int randomIndex = rand.nextInt(segmentsInMemory.size());
+    		segmentToCheck = segmentsInMemory.get(randomIndex);
+    		this.tlb.searchTLB(segmentToCheck);
+    	}
+    }
+    
+    public void printTLBMiss() {
+    	List<Segment> segmentsInMemory = this.getListSegmentsInMemory();
+    	Segment segment = null;
+
+    	segment = segmentsInMemory.get(0);
+    	
+    	this.tlb.deleteSegment(segment);
+    	this.tlb.searchTLB(segment);
+    	this.tlb.searchTLB(segment);
+
+    }
     
     
     

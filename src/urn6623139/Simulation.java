@@ -105,6 +105,25 @@ public class Simulation {
 		*/
 		
 		/*
+		String example9 = "1, [100;0], [200;0;2;3;4], 10";
+		//String example9 = "1, 100, 200";
+		memManager.parseExample(example9);
+		//memManager.printReadWriteStatus();
+		System.out.println("\n");
+		//String example10 = "1, [-10;1], [100;0]";
+		String example10 = "1, 10, [100;0;2;5], 10";
+		//String example10 = "1, [-10;1], [100;0;2;5]";
+		memManager.parseExample(example10);
+		
+		//String example11 = "2, 10";
+		//memManager.parseExample(example11);
+		
+		memManager.printReadWriteStatus();
+		
+		memManager.printSharedSegments();
+		*/
+		
+		/*
 		 * Example A.2.3
 		 */
 		
@@ -122,17 +141,16 @@ public class Simulation {
 		System.out.println("...filename and line number...");
 		System.out.println("Filename: MemoryManagement.java");
 		System.out.println("Line number: ");
-		System.out.println("End Code Location A.3.1 TLB");
+		System.out.println("End Code Location A.3.1 TLB\n");
 		
 		System.out.println("Start Example A.3.1 TLB working");
-		System.out.println("...the example...");
-		
-		memManager.
-		System.out.println("End Example A.3.1 TLB");
+		String example3 = "1, [10; 1], [200; 0; 2; 5], 10";
+		memManager.parseExample(example3);
+		memManager.printTLBWorking();
+		System.out.println("End Example A.3.1 TLB working\n");
 		
 		System.out.println("Start Example A.3.1 TLB miss");
-		
-		System.out.println("...the example...");
+		memManager.printTLBMiss();
 		System.out.println("End Example A.3.1 TLB miss");
 		*/
 		

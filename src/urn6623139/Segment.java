@@ -1,6 +1,7 @@
 package urn6623139;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,6 +18,7 @@ public class Segment {
 	private Process process;
     private List<Integer> sharedWithProcessIDs;
 	
+    private int segmentID;
     
     /**
      * Constructor for when only the limit of the segment is specified
@@ -128,16 +130,56 @@ public class Segment {
     }
  
     
-    public void addProcessToSharedList(int processID) {
-    	if(processID <= 0) {
-    		throw new IllegalArgumentException("Process cannot be 0 or less");
+    public void addProcessToSharedList(List<Integer> segmentSharedWith) {
+    	for(int id : segmentSharedWith) {
+    		if(!(this.sharedWithProcessIDs.contains(id))) {
+    			this.sharedWithProcessIDs.add(id);
+    		}
     	}
-    	if(!(this.sharedWithProcessIDs.contains(processID))) {
-    		this.sharedWithProcessIDs.add(processID);
-    	}
+    	
+    	System.out.println("Segment shared with process IDs: " + this.sharedWithProcessIDs);
     	
     }
    
+    
+    public List<Integer> getSharedProcesses(){
+    	return this.sharedWithProcessIDs;
+    }
+    
+    public List<Integer> getAllSharedProcesses(){
+    	this.sharedWithProcessIDs.add(this.getSegmentID());
+    	Collections.sort(sharedWithProcessIDs);
+    	return sharedWithProcessIDs;
+    	
+    }
+    
+    public boolean hasSharedList() {
+    	if(this.getSharedProcesses().size() >0) {
+    		return true;
+    	}
+    	return false;
+    }
+        
+    public void emptySharedList() {
+    	this.sharedWithProcessIDs.clear();
+    }
+    
+    public boolean checkIfProcessInSharedList(Process proc) {
+    	if(this.getSharedProcesses().contains(proc.getReference_number())) {
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    public int getSegmentID() {
+    	return this.segmentID;
+    }
+    
+    public void setSegmentID(int id) {
+    	this.segmentID = id;
+    }
+    
 }
 
 
