@@ -40,7 +40,7 @@ public class Simulation {
 		System.out.println("After step 3");
 		memManager.printMemory();
 		
-		String example4 = "2, -10, 300";
+		String example4 = "2, -10";
 		memManager.parseExample(example4);
 		System.out.println("After step 4");
 		memManager.printMemory();
@@ -74,7 +74,8 @@ public class Simulation {
 		 * Example A.2.1
 		 */
 
-		System.out.println("Start Code Location A.2.1 read-write protection");
+		
+		System.out.println("Start Code Location A.2.1 read-write protection\n");
 		System.out.println("Filename: MemoryManagement.java");
 		System.out.println("Line number: 205");
 		System.out.println("Line number: 678");
@@ -123,11 +124,18 @@ public class Simulation {
 		/*
 		String example9 = "1, [100; 0; 2]";
 		memManager.parseExample(example9);
+		memManager.printSharedSegments();
+		
 		String example10 = "2, [100; 0; 1]";
 		memManager.parseExample(example10);
-		System.out.println("\n");
-		String example11 = "1, [100;1]";
-		memManager.parseExample(example11);
+		memManager.printSharedSegments();
+		
+		memManager.printMemory();
+		//String example10 = "2, [100; 0; 1]";
+		//memManager.parseExample(example10);
+		//System.out.println("\n");
+		//String example11 = "1, [100;1]";
+		//memManager.parseExample(example11);
 		*/
 		
 		/*
@@ -162,10 +170,12 @@ public class Simulation {
 		 * Example A.3.1
 		 */
 		
-		System.out.println("Start Code Location A.3.1 TLB");
+		
+		System.out.println("\n\nStart Code Location A.3.1 TLB\n");
 		System.out.println("Filename: MemoryManagement.java");
 		System.out.println("Line number: 722 ");
 		System.out.println("Line number: 740 ");
+		System.out.println("Filename: TLB.java");
 		System.out.println("End Code Location A.3.1 TLB\n");
 		
 		System.out.println("Start Example A.3.1 TLB working");
@@ -187,7 +197,8 @@ public class Simulation {
 		 * Example A.3.2
 		 */
 		
-		System.out.println("Start Code Location A.3.2 Compaction");
+		
+		System.out.println("Start Code Location A.3.2 Compaction\n");
 		System.out.println("Filename: MemoryManagement.java");
 		System.out.println("Line number: 573");
 		System.out.println("End Code Location A.3.2 Compaction\n");
@@ -206,6 +217,7 @@ public class Simulation {
 		System.out.println("End Example A.3.2 Compaction");
 		
 		System.out.println("\n\n---------------------------------------------------------------------------------------------------");
+	
 	}
 	
 	

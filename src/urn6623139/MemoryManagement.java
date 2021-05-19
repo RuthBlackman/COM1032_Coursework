@@ -105,8 +105,7 @@ public class MemoryManagement {
 		Process proc;
 		int numBytes = 0;
 		int readWritePermissions = 1; // assume it is 1 unless the segment is shared or it specifies 0
-		
-		
+	
 		
 		
 		int size = example.split(",").length;
@@ -201,9 +200,23 @@ public class MemoryManagement {
 			
 			segment_number = i;
 			
+		//System.out.println(segmentSharedWith);
 		Segment segment = new Segment(proc, numBytes); //create new segment with details from input
 		segment.setReadWriteFlag(readWritePermissions);
 		Segment a = null;
+		
+		
+		
+	/*
+		if(this.needToAllocateSharedSegment(segmentSharedWith, segment)) {
+			System.out.println("want to allocate");
+			segment.addProcessToSharedList(segmentSharedWith);
+		}else {
+			System.out.println("dont want to allocate");
+			break;
+		}
+		*/
+		
 		
 		//check whether process already has segments in memory
 		Boolean processAlreadyInMemory = false;
@@ -240,22 +253,8 @@ public class MemoryManagement {
 		}
 		
 		segment.setSegmentID(this.getSegmentID(segment));
-		//segment.addProcessToSharedList(segmentSharedWith);
-		
-		/*
-		if(segment.hasSharedList()) {
-			this.sharedSegmentReadOnly(segment);
-			//if(segment.getReadWriteFlag()) {
-			//	System.out.println(segment.getReadWriteFlag());
-			//	throw new IllegalArgumentException("Shared segment must be read-only!");
-			//}
-		}
-		
-		if(this.checkIfSharedSegmentInMemory(segment)) {
-			System.out.println("shared segment exists");
-			break;
-		}
-		*/
+		//System.out.println(segment.getSegmentID());
+	
 		
 		//if the size of the segment is less than 0, then we are deallocating memory
 		if(numBytes < 0) {
@@ -272,6 +271,7 @@ public class MemoryManagement {
 		}
 		}
 	}
+		
 	
 	
 	/**
@@ -753,10 +753,59 @@ public class MemoryManagement {
     
     
     /**
-     * @TODO fix this if i have time :D
+     * @TODO
      * Code for A.2.2: Shared segments
      * 
      */
+    
+	/*
+	public boolean needToAllocateSharedSegment(List<Integer> segmentSharedWith, Segment segment) {
+		//if the segment is shared, then it must be read-only
+		if(segmentSharedWith.size() > 0) {
+			if(segment.getReadWriteFlag() == true) {
+				throw new RuntimeException("Shared segment must be read-only!");
+			}
+			System.out.println(segment.getLimit());
+			
+			for(Integer id: segmentSharedWith) {
+				System.out.println("h");
+				System.out.println(processesInMemory.size());
+				for(Entry<Process, List<Segment>> entry: processesInMemory.entrySet()) {
+					System.out.println("k");
+					if(entry.getKey().getReference_number() == id) {
+						System.out.println("Process exists");
+						for(Segment memorySegment: entry.getKey().getListSegments()) {
+							System.out.println("inner for loop");
+							System.out.println(memorySegment.getSharedProcesses());
+							//if(memorySegment.getSharedProcesses().contains(segment.getProcess().getReference_number())) {
+							if(memorySegment.getAllSharedProcesses().equals(segment.getAllSharedProcesses())){
+								if(memorySegment.getLimit() == segment.getLimit()) {
+									System.out.println("Shared segment aleady exists");
+									segment.addProcessToSharedList(segmentSharedWith);
+									return false;
+								}else {
+									System.out.println("Size different - adding segment");
+									return true;
+								}
+							}else {
+								segment.addProcessToSharedList(segmentSharedWith);
+								return true;
+							}
+							
+							
+
+						}
+					}
+				}
+			}
+			
+		}
+		
+		return true;
+	}
+	*/
+    
+    
     
     /*
     public void sharedSegmentReadOnly(Segment segment) {
@@ -787,7 +836,7 @@ public class MemoryManagement {
     	}
     	return false;
     }
- 
+ */
     
     public void printSharedSegments() {
     	System.out.println("\n----------------------------------\nSegments that are shared\n----------------------------------\n");
@@ -803,12 +852,5 @@ public class MemoryManagement {
 
 
     
-    
-    */
-    
-    
-
-    
-    
-    
+     
 }
